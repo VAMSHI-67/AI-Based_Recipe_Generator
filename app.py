@@ -3,9 +3,25 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# Load environment variables FIRST, before importing modules that use it
-env_path = Path(__file__).parent / ".env"
-load_dotenv(dotenv_path=env_path)
+# Load API key from Streamlit secrets (cloud) or .env file (local)
+def load_api_key():
+    """Load API key from Streamlit secrets (Streamlit Cloud) or .env file (local)"""
+    if "GEMINI_API_KEY" in st.secrets:
+        return st.secrets["GEMINI_API_KEY"]
+    
+    # Fall back to .env file for local development
+    load_dotenv()
+    return os.getenv("GEMINI_API_KEY")
+
+api_key = load_api_key()
+if not api_key:
+    st.error("❌ GEMINI_API_KEY not found in environment variables!")
+    st.info("**Local Setup**: Create .env file with GEMINI_API_KEY=your_key")
+    st.info("**Streamlit Cloud**: Add GEMINI_API_KEY in Secrets tab")
+    st.stop()
+
+# Set API key for ai_engine module
+os.environ["GEMINI_API_KEY"] = api_key
 
 from ai_engine import generate_multiple_recipes
 from youtube import generate_youtube_search_url

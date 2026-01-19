@@ -5,8 +5,10 @@ from typing import Optional, Dict, List
 
 # Configure Gemini API
 API_KEY = os.getenv("GEMINI_API_KEY")
-if API_KEY:
-    genai.configure(api_key=API_KEY)
+if not API_KEY:
+    raise ValueError("❌ GEMINI_API_KEY environment variable not set!")
+
+genai.configure(api_key=API_KEY)
 
 
 def get_available_model():
